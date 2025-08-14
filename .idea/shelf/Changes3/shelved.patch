@@ -1,0 +1,532 @@
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+new file mode 100644
+--- /dev/null	(date 1755177476070)
++++ b/pom.xml	(date 1755177476070)
+@@ -0,0 +1,52 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project xmlns="http://maven.apache.org/POM/4.0.0"
++         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++    <modelVersion>4.0.0</modelVersion>
++
++    <groupId>org.example</groupId>
++    <artifactId>hw-db-connection</artifactId>
++    <version>1.0-SNAPSHOT</version>
++
++    <properties>
++        <maven.compiler.source>17</maven.compiler.source>
++        <maven.compiler.target>17</maven.compiler.target>
++        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
++    </properties>
++
++    <dependencies>
++        <dependency>
++            <groupId>org.postgresql</groupId>
++            <artifactId>postgresql</artifactId>
++            <version>42.7.3</version>
++        </dependency>
++        <dependency>
++            <groupId>com.zaxxer</groupId>
++            <artifactId>HikariCP</artifactId>
++            <version>5.1.0</version>
++            <optional>true</optional>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework</groupId>
++            <artifactId>spring-context</artifactId>
++            <version>6.2.7</version>
++            <optional>true</optional>
++        </dependency>
++        <dependency>
++            <groupId>org.slf4j</groupId>
++            <artifactId>slf4j-simple</artifactId>
++            <version>2.0.13</version>
++            <scope>runtime</scope>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework</groupId>
++            <artifactId>spring-tx</artifactId>
++            <version>6.2.9</version>
++        </dependency>
++        <dependency>
++            <groupId>org.springframework</groupId>
++            <artifactId>spring-jdbc</artifactId>
++            <version>6.2.9</version>
++        </dependency>
++    </dependencies>
++</project>
+\ No newline at end of file
+Index: src/main/java/org/example/ValidationException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/ValidationException.java b/src/main/java/org/example/ValidationException.java
+new file mode 100644
+--- /dev/null	(date 1755177476068)
++++ b/src/main/java/org/example/ValidationException.java	(date 1755177476068)
+@@ -0,0 +1,7 @@
++package org.example;
++
++public class ValidationException extends RuntimeException {
++    public ValidationException(String message) {
++        super(message);
++    }
++}
+Index: src/main/java/org/example/UserDaoImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/UserDaoImpl.java b/src/main/java/org/example/UserDaoImpl.java
+new file mode 100644
+--- /dev/null	(date 1755177476046)
++++ b/src/main/java/org/example/UserDaoImpl.java	(date 1755177476046)
+@@ -0,0 +1,160 @@
++package org.example;
++
++import javax.sql.DataSource;
++import java.sql.*;
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Map;
++import java.util.Optional;
++
++public class UserDaoImpl implements UserDao {
++    private final DataSource dataSource;
++
++    public UserDaoImpl(DataSource dataSource) {
++        this.dataSource = dataSource;
++    }
++
++    @Override
++    public void create(User user) {
++        String sql = "INSERT INTO users (username) VALUES (?)";
++
++        try (Connection conn = dataSource.getConnection();
++            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
++        ) {
++            stmt.setString(1, user.getUserName());
++            stmt.executeUpdate();
++
++            ResultSet keys = stmt.getGeneratedKeys();
++
++            if (keys.next()) {
++                user.setId(keys.getLong(1));
++            }
++        } catch (SQLException e) {
++            throw new RuntimeException("Error creating user", e);
++        }
++    }
++
++    @Override
++    public void update(User user) {
++        String sql = "UPDATE users SET username = ? WHERE id = ?";
++
++        try (Connection conn = dataSource.getConnection();
++             PreparedStatement stmt = conn.prepareStatement(sql)
++        ) {
++            stmt.setString(1, user.getUserName());
++            stmt.setLong(2, user.getId());
++            stmt.executeUpdate();
++        } catch (SQLException e) {
++            throw new RuntimeException("Error updating user", e);
++        }
++    }
++
++    @Override
++    public void delete(Long id) {
++        String sql = "DELETE FROM users WHERE id = ?";
++
++        try (Connection conn = dataSource.getConnection();
++             PreparedStatement stmt = conn.prepareStatement(sql)
++        ) {
++            stmt.setLong(1, id);
++            stmt.executeUpdate();
++        } catch (SQLException e) {
++            throw new RuntimeException("Error deleting user", e);
++        }
++    }
++
++    @Override
++    public Optional<User> findById(Long id) {
++        String sql = "SELECT id, username FROM users WHERE id = ?";
++
++        try (Connection conn = dataSource.getConnection();
++             PreparedStatement stmt = conn.prepareStatement(sql)
++        ) {
++            stmt.setLong(1, id);
++            ResultSet rs = stmt.executeQuery();
++
++            if (rs.next()) {
++                return Optional.of(new User(rs.getLong("id"), rs.getString("username")));
++            }
++            return Optional.empty();
++        } catch (SQLException e) {
++            throw new RuntimeException("Error finding user by id", e);
++        }
++    }
++
++    @Override
++    public List<User> findAll() {
++        String sql = "SELECT id, username FROM users";
++
++        List<User> users = new ArrayList<>();
++
++        try (Connection conn = dataSource.getConnection();
++             Statement stmt = conn.createStatement();
++             ResultSet rs = stmt.executeQuery(sql)
++        ) {
++            while (rs.next()) {
++                users.add(new User(rs.getLong("id"), rs.getString("username")));
++            }
++        } catch (SQLException e) {
++            throw new RuntimeException("Error fetching all users", e);
++        }
++
++        return users;
++    }
++
++    @Override
++    public List<User> searchUsers(String usernamePart, int limit, int offset) {
++        String sql = "SELECT id, username FROM users WHERE username LIKE ? LIMIT ? OFFSET ?";
++        List<User> users = new ArrayList<>();
++
++        try (Connection conn = dataSource.getConnection();
++             PreparedStatement stmt = conn.prepareStatement(sql)
++        ) {
++            stmt.setString(1, usernamePart);
++            stmt.setInt(2, limit);
++            stmt.setInt(3, offset);
++
++            ResultSet rs = stmt.executeQuery();
++
++            while (rs.next()) {
++                users.add(new User(rs.getLong("id"), rs.getString("username")));
++            }
++        } catch (SQLException e) {
++            throw new RuntimeException("Error search users", e);
++        }
++
++        return users;
++    }
++
++    @Override
++    public void updateUserNames(Map<Long, String> idToUsernameMap) {
++        String sql = "UPDATE users SET username = ? WHERE id = ?";
++
++        try (Connection conn = dataSource.getConnection();
++             PreparedStatement stmt = conn.prepareStatement(sql)
++        ) {
++            conn.setAutoCommit(false);
++
++            for (Map.Entry<Long, String> entry : idToUsernameMap.entrySet()) {
++                Long id = entry.getKey();
++                String username = entry.getValue();
++
++                stmt.setString(1, username);
++                stmt.setLong(2, id);
++                stmt.addBatch();
++            }
++
++            stmt.executeBatch();
++
++            conn.commit();
++        } catch (SQLException e) {
++            try (Connection conn = dataSource.getConnection()) {
++                conn.rollback();
++            } catch (SQLException rollbackException) {
++                System.err.println("Error rolling back transaction: " + rollbackException.getMessage());
++            }
++
++            throw new RuntimeException("Error updating usernames in batch in DB", e);
++        }
++    }
++}
+Index: src/main/java/org/example/UserService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/UserService.java b/src/main/java/org/example/UserService.java
+new file mode 100644
+--- /dev/null	(date 1755177476041)
++++ b/src/main/java/org/example/UserService.java	(date 1755177476041)
+@@ -0,0 +1,22 @@
++package org.example;
++
++import java.util.List;
++import java.util.Map;
++import java.util.Optional;
++
++public interface UserService {
++    void registerUser(String userName);
++
++    void renameUser(Long id, String newUserName);
++
++    void deleteUser(Long id);
++
++    void updateUserNames(Map<Long, String> idToUsernameMap);
++
++    Optional<User> getUser(Long id);
++
++    List<User> getAllUsers();
++
++    List<User> searchUsers(String usernamePart, int limit, int offset);
++}
++
+Index: src/main/java/org/example/Configurer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/Configurer.java b/src/main/java/org/example/Configurer.java
+new file mode 100644
+--- /dev/null	(date 1755177476036)
++++ b/src/main/java/org/example/Configurer.java	(date 1755177476036)
+@@ -0,0 +1,42 @@
++package org.example;
++
++import com.zaxxer.hikari.HikariConfig;
++import com.zaxxer.hikari.HikariDataSource;
++
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import org.springframework.jdbc.datasource.DataSourceTransactionManager;
++import org.springframework.transaction.PlatformTransactionManager;
++import org.springframework.transaction.annotation.EnableTransactionManagement;
++
++import javax.sql.DataSource;
++
++@Configuration
++@EnableTransactionManagement
++public class Configurer {
++
++    @Bean
++    public HikariConfig dbConnectionPoolConfig() {
++        HikariConfig config = new HikariConfig();
++
++        config.setJdbcUrl("jdbc:postgresql://localhost:5433/pgsdb");
++        config.setUsername("pgsuser");
++        config.setPassword("pgspw");
++        config.setMaximumPoolSize(10);
++        config.setMinimumIdle(2);
++        config.setPoolName("DemoHikariCP");
++        config.setDriverClassName("org.postgresql.Driver");
++
++        return config;
++    }
++
++    @Bean
++    public DataSource dataSource(HikariConfig dbConnectionPoolConfig) {
++        return new HikariDataSource(dbConnectionPoolConfig);
++    }
++
++    @Bean
++    public PlatformTransactionManager transactionManager(DataSource dataSource) {
++        return new DataSourceTransactionManager(dataSource);
++    }
++}
+Index: src/main/java/org/example/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/User.java b/src/main/java/org/example/User.java
+new file mode 100644
+--- /dev/null	(date 1755177476054)
++++ b/src/main/java/org/example/User.java	(date 1755177476054)
+@@ -0,0 +1,36 @@
++package org.example;
++
++public class User {
++    private Long id;
++    private String userName;
++
++    public User() {
++    }
++
++    public User(Long id, String userName) {
++        this.id = id;
++        this.userName = userName;
++    }
++
++    public Long getId() {
++        return id;
++    }
++
++    public void setId(Long id) {
++        this.id = id;
++    }
++
++    public String getUserName() {
++        return userName;
++    }
++
++    public void setUserName(String username) {
++        this.userName = username;
++    }
++
++    @Override
++    public String toString() {
++        return "User{id=" + id + ", userName='" + userName + "'}";
++    }
++
++}
+Index: src/main/java/org/example/UserDao.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/UserDao.java b/src/main/java/org/example/UserDao.java
+new file mode 100644
+--- /dev/null	(date 1755177476050)
++++ b/src/main/java/org/example/UserDao.java	(date 1755177476050)
+@@ -0,0 +1,22 @@
++package org.example;
++
++import java.util.List;
++import java.util.Map;
++import java.util.Optional;
++
++public interface UserDao {
++    void create(User user);
++
++    void update(User user);
++
++    void delete(Long id);
++
++    Optional<User> findById(Long id);
++
++    List<User> findAll();
++
++    List<User> searchUsers(String usernamePart, int limit, int offset);
++
++    void updateUserNames(Map<Long, String> idToUsernameMap);
++}
++
+Index: docker-compose.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docker-compose.yaml b/docker-compose.yaml
+new file mode 100644
+--- /dev/null	(date 1755177476048)
++++ b/docker-compose.yaml	(date 1755177476048)
+@@ -0,0 +1,11 @@
++version: '3.8'
++services:
++  postgres:
++    image: postgres:16
++    container_name: java-pg
++    environment:
++      POSTGRES_DB: pgsdb
++      POSTGRES_USER: pgsuser
++      POSTGRES_PASSWORD: pgspw
++    ports:
++      - "5433:5432"
+Index: src/main/java/org/example/UserServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/UserServiceImpl.java b/src/main/java/org/example/UserServiceImpl.java
+new file mode 100644
+--- /dev/null	(date 1755177476065)
++++ b/src/main/java/org/example/UserServiceImpl.java	(date 1755177476065)
+@@ -0,0 +1,89 @@
++package org.example;
++
++import org.springframework.transaction.annotation.Transactional;
++
++import java.util.List;
++import java.util.Map;
++import java.util.Optional;
++import java.util.regex.Pattern;
++
++public class UserServiceImpl implements UserService {
++    private final UserDao userDao;
++
++    public UserServiceImpl(UserDao userDao) {
++        this.userDao = userDao;
++    }
++
++    @Override
++    public void registerUser(String username) throws ValidationException {
++        validateUsername(username);
++
++        User user = new User();
++        user.setUserName(username);
++
++        userDao.create(user);
++
++        System.out.println("User created: " + user.getUserName());
++    }
++
++    @Override
++    public void renameUser(Long id, String newUserName) throws ValidationException {
++        validateUsername(newUserName);
++        Optional<User> optionalUser = userDao.findById(id);
++
++        if (optionalUser.isPresent()) {
++            User user = optionalUser.get();
++            user.setUserName(newUserName);
++
++            userDao.update(user);
++            System.out.println("User updated: " + user.getUserName());
++        }
++    }
++
++    @Override
++    @Transactional
++    public void updateUserNames(Map<Long, String> idToUserNameMap) {
++        for (String userName : idToUserNameMap.values()) {
++            validateUsername(userName);
++        }
++
++        userDao.updateUserNames(idToUserNameMap);
++        System.out.println("UserNames updated in bulk: " + idToUserNameMap.size() + " users");
++    }
++
++    @Override
++    public void deleteUser(Long id) {
++        userDao.delete(id);
++
++        System.out.println("User with id: " + id + " is removed");
++    }
++
++    @Override
++    public Optional<User> getUser(Long id) {
++        return userDao.findById(id);
++    }
++
++    @Override
++    public List<User> getAllUsers() {
++        return userDao.findAll();
++    }
++
++    @Override
++    public List<User> searchUsers(String usernamePart, int limit, int offset) {
++        return userDao.searchUsers(usernamePart, limit, offset);
++    }
++
++    private void validateUsername(String username) {
++        if (username == null || username.isEmpty()) {
++            throw new ValidationException("Имя пользователя не должно быть пустым.");
++        }
++
++        if (username.length() < 3 || username.length() > 30) {
++            throw new ValidationException("Имя пользователя должно быть не менее 3 символов и не более 30 символов.");
++        }
++
++        if (!Pattern.matches("^[a-zA-Z0-9_]+$", username)) {
++            throw new ValidationException("Имя пользователя может содержать только буквы, цифры и подчеркивания.");
++        }
++    }
++}
