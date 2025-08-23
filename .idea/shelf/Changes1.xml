@@ -1,0 +1,36 @@
+<changelist name="Changes1" date="1755177508459" recycled="false">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/shelved.patch" />
+  <option name="DESCRIPTION" value="Changes" />
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/UserDao.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/UserDao.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/User.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/User.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/UserDaoImpl.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/UserDaoImpl.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/UserService.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/UserService.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/UserServiceImpl.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/UserServiceImpl.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/ValidationException.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/ValidationException.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/Main.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/Main.class" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="target/classes/org/example/Configurer.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes1/Configurer.class" />
+  </binary>
+</changelist>

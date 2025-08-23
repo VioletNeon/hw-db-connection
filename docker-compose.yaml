@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:16
+    container_name: java-pg
+    environment:
+      POSTGRES_DB: pgsdb
+      POSTGRES_USER: pgsuser
+      POSTGRES_PASSWORD: pgspw
+    ports:
+      - "5433:5432"
