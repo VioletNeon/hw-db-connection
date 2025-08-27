@@ -5,15 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a3f6905-9b3d-4761-9387-94c8c3a9766b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/Article.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/Author.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/JpaUtil.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/bootstrap/DataLoader.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/ProductController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/domain/Product.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/ProductDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/exception/RestExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/repository/ArticleRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/repository/AuthorRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/repository/ProductRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/utils/mappers/ProductMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V1__init_schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Article.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/domain/Article.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Author.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/domain/Author.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Configurer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/JpaUtil.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserDao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserDaoImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ValidationException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/exception/ValidationException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +84,7 @@
       <module name="hw-db-connection" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="org.example.*" />
+          <option name="PATTERN" value="org.example.domain.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>

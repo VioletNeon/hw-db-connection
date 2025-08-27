@@ -1,0 +1,1416 @@
+Index: src/main/java/org/example/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example;\n\nimport jakarta.persistence.EntityManager;\nimport jakarta.persistence.EntityTransaction;\nimport org.springframework.context.annotation.AnnotationConfigApplicationContext;\n\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        EntityManager em = JpaUtil.emf().createEntityManager();\n        EntityTransaction tx = em.getTransaction();\n\n        try {\n            tx.begin();\n\n            Author author1 = new Author();\n            Author author2 = new Author();\n\n            author1.setName(\"Fedor\");\n            author2.setName(\"Petr\");\n\n            Article article1 = new Article();\n            Article article2 = new Article();\n            Article article3 = new Article();\n            Article article4 = new Article();\n            Article article5 = new Article();\n\n            article1.setContent(\"1 статья автора1 - Fedor\");\n            article2.setContent(\"2 статья автора1 - Fedor\");\n            article3.setContent(\"3 статья автора1 - Fedor\");\n            article4.setContent(\"4 статья автора2 - Petr\");\n            article5.setContent(\"5 статья автора2 - Petr\");\n\n            author1.addArticle(article1);\n            author1.addArticle(article2);\n            author1.addArticle(article3);\n\n            author2.addArticle(article4);\n            author2.addArticle(article5);\n\n            em.persist(author1);\n            em.persist(author2);\n\n            em.flush();\n\n            tx.commit();\n\n            em.clear();\n\n            tx.begin();\n\n            Author loadedAuthor1 = em.createQuery(\n                            \"select a from Author a where a.name = :an\", Author.class)\n                    .setParameter(\"an\", \"Fedor\")\n                    .getSingleResult();\n\n            Author loadedAuthor2 = em.createQuery(\n                            \"select a from Author a where a.name = :an\", Author.class)\n                    .setParameter(\"an\", \"Petr\")\n                    .getSingleResult();\n\n            System.out.println(\"Loaded first author id=\" + loadedAuthor1.getId() + \", name=\" + loadedAuthor1.getName());\n            System.out.println(\"Loaded second author id=\" + loadedAuthor2.getId() + \", name=\" + loadedAuthor2.getName());\n\n            int articlesCountOfFirstAuthor = loadedAuthor1.getArticles().size();\n            int articlesCountOfFSecondAuthor = loadedAuthor2.getArticles().size();\n\n            System.out.println(\"Articles count of first author = \" + articlesCountOfFirstAuthor);\n            System.out.println(\"Articles count of second author = \" + articlesCountOfFSecondAuthor);\n\n            loadedAuthor1.removeArticle(article2);\n\n            em.remove(loadedAuthor2);\n\n            em.flush();\n            tx.commit();\n\n            em.clear();\n        } finally {\n            em.close();\n            JpaUtil.close();\n        }\n    }\n\n    private void checkHW4() {\n        var context = new AnnotationConfigApplicationContext(Configurer.class);\n        var dataSource = context.getBean(javax.sql.DataSource.class);\n\n        var userDao = new UserDaoImpl(dataSource);\n        var userService = new UserServiceImpl(userDao);\n\n\n        userService.registerUser(\"1user1\");\n\n        List<User> users = userService.getAllUsers();\n        users.forEach(System.out::println);\n\n        if (!users.isEmpty()) {\n            User firstUser = users.get(0);\n            userService.renameUser(firstUser.getId(), \"2user2\");\n\n            System.out.println(\"✅ После переименования:\");\n\n            userService.getAllUsers().forEach(System.out::println);\n        }\n\n        if (!users.isEmpty()) {\n            User firstUser = users.get(0);\n            userService.deleteUser(firstUser.getId());\n\n            System.out.println(\"✅ После удаления:\");\n\n            userService.getAllUsers().forEach(System.out::println);\n        }\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/Main.java b/src/main/java/org/example/Main.java
+--- a/src/main/java/org/example/Main.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ b/src/main/java/org/example/Main.java	(date 1756300481090)
+@@ -1,117 +1,11 @@
+ package org.example;
+ 
+-import jakarta.persistence.EntityManager;
+-import jakarta.persistence.EntityTransaction;
+-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
++import org.springframework.boot.SpringApplication;
++import org.springframework.boot.autoconfigure.SpringBootApplication;
+ 
+-import java.util.List;
+-
++@SpringBootApplication
+ public class Main {
+     public static void main(String[] args) {
+-        EntityManager em = JpaUtil.emf().createEntityManager();
+-        EntityTransaction tx = em.getTransaction();
+-
+-        try {
+-            tx.begin();
+-
+-            Author author1 = new Author();
+-            Author author2 = new Author();
+-
+-            author1.setName("Fedor");
+-            author2.setName("Petr");
+-
+-            Article article1 = new Article();
+-            Article article2 = new Article();
+-            Article article3 = new Article();
+-            Article article4 = new Article();
+-            Article article5 = new Article();
+-
+-            article1.setContent("1 статья автора1 - Fedor");
+-            article2.setContent("2 статья автора1 - Fedor");
+-            article3.setContent("3 статья автора1 - Fedor");
+-            article4.setContent("4 статья автора2 - Petr");
+-            article5.setContent("5 статья автора2 - Petr");
+-
+-            author1.addArticle(article1);
+-            author1.addArticle(article2);
+-            author1.addArticle(article3);
+-
+-            author2.addArticle(article4);
+-            author2.addArticle(article5);
+-
+-            em.persist(author1);
+-            em.persist(author2);
+-
+-            em.flush();
+-
+-            tx.commit();
+-
+-            em.clear();
+-
+-            tx.begin();
+-
+-            Author loadedAuthor1 = em.createQuery(
+-                            "select a from Author a where a.name = :an", Author.class)
+-                    .setParameter("an", "Fedor")
+-                    .getSingleResult();
+-
+-            Author loadedAuthor2 = em.createQuery(
+-                            "select a from Author a where a.name = :an", Author.class)
+-                    .setParameter("an", "Petr")
+-                    .getSingleResult();
+-
+-            System.out.println("Loaded first author id=" + loadedAuthor1.getId() + ", name=" + loadedAuthor1.getName());
+-            System.out.println("Loaded second author id=" + loadedAuthor2.getId() + ", name=" + loadedAuthor2.getName());
+-
+-            int articlesCountOfFirstAuthor = loadedAuthor1.getArticles().size();
+-            int articlesCountOfFSecondAuthor = loadedAuthor2.getArticles().size();
+-
+-            System.out.println("Articles count of first author = " + articlesCountOfFirstAuthor);
+-            System.out.println("Articles count of second author = " + articlesCountOfFSecondAuthor);
+-
+-            loadedAuthor1.removeArticle(article2);
+-
+-            em.remove(loadedAuthor2);
+-
+-            em.flush();
+-            tx.commit();
+-
+-            em.clear();
+-        } finally {
+-            em.close();
+-            JpaUtil.close();
+-        }
+-    }
+-
+-    private void checkHW4() {
+-        var context = new AnnotationConfigApplicationContext(Configurer.class);
+-        var dataSource = context.getBean(javax.sql.DataSource.class);
+-
+-        var userDao = new UserDaoImpl(dataSource);
+-        var userService = new UserServiceImpl(userDao);
+-
+-
+-        userService.registerUser("1user1");
+-
+-        List<User> users = userService.getAllUsers();
+-        users.forEach(System.out::println);
+-
+-        if (!users.isEmpty()) {
+-            User firstUser = users.get(0);
+-            userService.renameUser(firstUser.getId(), "2user2");
+-
+-            System.out.println("✅ После переименования:");
+-
+-            userService.getAllUsers().forEach(System.out::println);
+-        }
+-
+-        if (!users.isEmpty()) {
+-            User firstUser = users.get(0);
+-            userService.deleteUser(firstUser.getId());
+-
+-            System.out.println("✅ После удаления:");
+-
+-            userService.getAllUsers().forEach(System.out::println);
+-        }
++        SpringApplication.run(Main.class, args);
+     }
+ }
+\ No newline at end of file
+Index: src/main/java/org/example/Author.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/Author.java b/src/main/java/org/example/domain/Author.java
+rename from src/main/java/org/example/Author.java
+rename to src/main/java/org/example/domain/Author.java
+--- a/src/main/java/org/example/Author.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ b/src/main/java/org/example/domain/Author.java	(date 1756301653904)
+@@ -1,4 +1,4 @@
+-package org.example;
++package org.example.domain;
+ 
+ import jakarta.persistence.*;
+ import jakarta.validation.constraints.Pattern;
+@@ -34,6 +34,14 @@
+     )
+     private List<Article> articles = new ArrayList<>();
+ 
++    @OneToMany(
++            mappedBy = "author",
++            cascade = CascadeType.ALL,
++            orphanRemoval = true,
++            fetch = FetchType.LAZY
++    )
++    private List<Product> products = new ArrayList<>();
++
+     public void addArticle(Article article) {
+         articles.add(article);
+         article.setAuthor(this);
+@@ -44,6 +52,16 @@
+         article.setAuthor(null);
+     }
+ 
++    public void addProduct(Product product) {
++        products.add(product);
++        product.setAuthor(this);
++    }
++
++    public void removeProduct(Product product) {
++        products.remove(product);
++        product.setAuthor(null);
++    }
++
+     public Long getId() {
+         return id;
+     }
+@@ -56,6 +74,10 @@
+         return articles;
+     }
+ 
++    public List<Product> getProducts() {
++        return products;
++    }
++
+     public void setName(String name) {
+         this.name = name;
+     }
+@@ -77,6 +99,6 @@
+ 
+     @Override
+     public String toString() {
+-        return "User{id=" + id + ", name='" + name + "'}";
++        return "Author{id=" + id + ", name='" + name + "'}";
+     }
+ }
+Index: src/main/java/org/example/Article.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/Article.java b/src/main/java/org/example/domain/Article.java
+rename from src/main/java/org/example/Article.java
+rename to src/main/java/org/example/domain/Article.java
+--- a/src/main/java/org/example/Article.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ b/src/main/java/org/example/domain/Article.java	(date 1756281613527)
+@@ -1,4 +1,4 @@
+-package org.example;
++package org.example.domain;
+ 
+ import jakarta.persistence.*;
+ import jakarta.validation.constraints.NotBlank;
+Index: src/main/java/org/example/Configurer.java
+===================================================================
+diff --git a/src/main/java/org/example/Configurer.java b/src/main/java/org/example/Configurer.java
+deleted file mode 100644
+--- a/src/main/java/org/example/Configurer.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,42 +0,0 @@
+-package org.example;
+-
+-import com.zaxxer.hikari.HikariConfig;
+-import com.zaxxer.hikari.HikariDataSource;
+-
+-import org.springframework.context.annotation.Bean;
+-import org.springframework.context.annotation.Configuration;
+-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+-import org.springframework.transaction.PlatformTransactionManager;
+-import org.springframework.transaction.annotation.EnableTransactionManagement;
+-
+-import javax.sql.DataSource;
+-
+-@Configuration
+-@EnableTransactionManagement
+-public class Configurer {
+-
+-    @Bean
+-    public HikariConfig dbConnectionPoolConfig() {
+-        HikariConfig config = new HikariConfig();
+-
+-        config.setJdbcUrl("jdbc:postgresql://localhost:5433/pgsdb");
+-        config.setUsername("pgsuser");
+-        config.setPassword("pgspw");
+-        config.setMaximumPoolSize(10);
+-        config.setMinimumIdle(2);
+-        config.setPoolName("DemoHikariCP");
+-        config.setDriverClassName("org.postgresql.Driver");
+-
+-        return config;
+-    }
+-
+-    @Bean
+-    public DataSource dataSource(HikariConfig dbConnectionPoolConfig) {
+-        return new HikariDataSource(dbConnectionPoolConfig);
+-    }
+-
+-    @Bean
+-    public PlatformTransactionManager transactionManager(DataSource dataSource) {
+-        return new DataSourceTransactionManager(dataSource);
+-    }
+-}
+Index: src/main/java/org/example/JpaUtil.java
+===================================================================
+diff --git a/src/main/java/org/example/JpaUtil.java b/src/main/java/org/example/JpaUtil.java
+deleted file mode 100644
+--- a/src/main/java/org/example/JpaUtil.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,21 +0,0 @@
+-package org.example;
+-
+-import jakarta.persistence.EntityManagerFactory;
+-import jakarta.persistence.Persistence;
+-
+-public final class JpaUtil {
+-    private JpaUtil() {}
+-
+-    public static final String PU = "HW5";
+-
+-    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory(PU);
+-
+-    public static EntityManagerFactory emf() {
+-        return emf;
+-    }
+-
+-    public static void close() {
+-        emf.close();
+-    }
+-}
+-
+Index: src/main/resources/META-INF/persistence.xml
+===================================================================
+diff --git a/src/main/resources/META-INF/persistence.xml b/src/main/resources/META-INF/persistence.xml
+deleted file mode 100644
+--- a/src/main/resources/META-INF/persistence.xml	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,21 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<persistence version="3.0"
+-             xmlns="https://jakarta.ee/xml/ns/persistence"
+-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+-                                 https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+-    <persistence-unit name="HW5" transaction-type="RESOURCE_LOCAL">
+-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+-        <properties>
+-            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+-            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5433/pgsdb"/>
+-            <property name="jakarta.persistence.jdbc.user" value="pgsuser"/>
+-            <property name="jakarta.persistence.jdbc.password" value="pgspw"/>
+-            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+-            <property name="hibernate.show_sql" value="true"/>
+-            <property name="hibernate.format_sql" value="true"/>
+-            <property name="hibernate.highlight_sql" value="true"/>
+-            <property name="hibernate.use_sql_comments" value="true"/>
+-        </properties>
+-    </persistence-unit>
+-</persistence>
+Index: src/main/java/org/example/User.java
+===================================================================
+diff --git a/src/main/java/org/example/User.java b/src/main/java/org/example/User.java
+deleted file mode 100644
+--- a/src/main/java/org/example/User.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,36 +0,0 @@
+-package org.example;
+-
+-public class User {
+-    private Long id;
+-    private String userName;
+-
+-    public User() {
+-    }
+-
+-    public User(Long id, String userName) {
+-        this.id = id;
+-        this.userName = userName;
+-    }
+-
+-    public Long getId() {
+-        return id;
+-    }
+-
+-    public void setId(Long id) {
+-        this.id = id;
+-    }
+-
+-    public String getUserName() {
+-        return userName;
+-    }
+-
+-    public void setUserName(String username) {
+-        this.userName = username;
+-    }
+-
+-    @Override
+-    public String toString() {
+-        return "User{id=" + id + ", userName='" + userName + "'}";
+-    }
+-
+-}
+Index: src/main/java/org/example/UserDao.java
+===================================================================
+diff --git a/src/main/java/org/example/UserDao.java b/src/main/java/org/example/UserDao.java
+deleted file mode 100644
+--- a/src/main/java/org/example/UserDao.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,22 +0,0 @@
+-package org.example;
+-
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-
+-public interface UserDao {
+-    void create(User user);
+-
+-    void update(User user);
+-
+-    void delete(Long id);
+-
+-    Optional<User> findById(Long id);
+-
+-    List<User> findAll();
+-
+-    List<User> searchUsers(String usernamePart, int limit, int offset);
+-
+-    void updateUserNames(Map<Long, String> idToUsernameMap);
+-}
+-
+Index: src/main/java/org/example/UserDaoImpl.java
+===================================================================
+diff --git a/src/main/java/org/example/UserDaoImpl.java b/src/main/java/org/example/UserDaoImpl.java
+deleted file mode 100644
+--- a/src/main/java/org/example/UserDaoImpl.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,160 +0,0 @@
+-package org.example;
+-
+-import javax.sql.DataSource;
+-import java.sql.*;
+-import java.util.ArrayList;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-
+-public class UserDaoImpl implements UserDao {
+-    private final DataSource dataSource;
+-
+-    public UserDaoImpl(DataSource dataSource) {
+-        this.dataSource = dataSource;
+-    }
+-
+-    @Override
+-    public void create(User user) {
+-        String sql = "INSERT INTO users (username) VALUES (?)";
+-
+-        try (Connection conn = dataSource.getConnection();
+-            PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+-        ) {
+-            stmt.setString(1, user.getUserName());
+-            stmt.executeUpdate();
+-
+-            ResultSet keys = stmt.getGeneratedKeys();
+-
+-            if (keys.next()) {
+-                user.setId(keys.getLong(1));
+-            }
+-        } catch (SQLException e) {
+-            throw new RuntimeException("Error creating user", e);
+-        }
+-    }
+-
+-    @Override
+-    public void update(User user) {
+-        String sql = "UPDATE users SET username = ? WHERE id = ?";
+-
+-        try (Connection conn = dataSource.getConnection();
+-             PreparedStatement stmt = conn.prepareStatement(sql)
+-        ) {
+-            stmt.setString(1, user.getUserName());
+-            stmt.setLong(2, user.getId());
+-            stmt.executeUpdate();
+-        } catch (SQLException e) {
+-            throw new RuntimeException("Error updating user", e);
+-        }
+-    }
+-
+-    @Override
+-    public void delete(Long id) {
+-        String sql = "DELETE FROM users WHERE id = ?";
+-
+-        try (Connection conn = dataSource.getConnection();
+-             PreparedStatement stmt = conn.prepareStatement(sql)
+-        ) {
+-            stmt.setLong(1, id);
+-            stmt.executeUpdate();
+-        } catch (SQLException e) {
+-            throw new RuntimeException("Error deleting user", e);
+-        }
+-    }
+-
+-    @Override
+-    public Optional<User> findById(Long id) {
+-        String sql = "SELECT id, username FROM users WHERE id = ?";
+-
+-        try (Connection conn = dataSource.getConnection();
+-             PreparedStatement stmt = conn.prepareStatement(sql)
+-        ) {
+-            stmt.setLong(1, id);
+-            ResultSet rs = stmt.executeQuery();
+-
+-            if (rs.next()) {
+-                return Optional.of(new User(rs.getLong("id"), rs.getString("username")));
+-            }
+-            return Optional.empty();
+-        } catch (SQLException e) {
+-            throw new RuntimeException("Error finding user by id", e);
+-        }
+-    }
+-
+-    @Override
+-    public List<User> findAll() {
+-        String sql = "SELECT id, username FROM users";
+-
+-        List<User> users = new ArrayList<>();
+-
+-        try (Connection conn = dataSource.getConnection();
+-             Statement stmt = conn.createStatement();
+-             ResultSet rs = stmt.executeQuery(sql)
+-        ) {
+-            while (rs.next()) {
+-                users.add(new User(rs.getLong("id"), rs.getString("username")));
+-            }
+-        } catch (SQLException e) {
+-            throw new RuntimeException("Error fetching all users", e);
+-        }
+-
+-        return users;
+-    }
+-
+-    @Override
+-    public List<User> searchUsers(String usernamePart, int limit, int offset) {
+-        String sql = "SELECT id, username FROM users WHERE username LIKE ? LIMIT ? OFFSET ?";
+-        List<User> users = new ArrayList<>();
+-
+-        try (Connection conn = dataSource.getConnection();
+-             PreparedStatement stmt = conn.prepareStatement(sql)
+-        ) {
+-            stmt.setString(1, usernamePart);
+-            stmt.setInt(2, limit);
+-            stmt.setInt(3, offset);
+-
+-            ResultSet rs = stmt.executeQuery();
+-
+-            while (rs.next()) {
+-                users.add(new User(rs.getLong("id"), rs.getString("username")));
+-            }
+-        } catch (SQLException e) {
+-            throw new RuntimeException("Error search users", e);
+-        }
+-
+-        return users;
+-    }
+-
+-    @Override
+-    public void updateUserNames(Map<Long, String> idToUsernameMap) {
+-        String sql = "UPDATE users SET username = ? WHERE id = ?";
+-
+-        try (Connection conn = dataSource.getConnection();
+-             PreparedStatement stmt = conn.prepareStatement(sql)
+-        ) {
+-            conn.setAutoCommit(false);
+-
+-            for (Map.Entry<Long, String> entry : idToUsernameMap.entrySet()) {
+-                Long id = entry.getKey();
+-                String username = entry.getValue();
+-
+-                stmt.setString(1, username);
+-                stmt.setLong(2, id);
+-                stmt.addBatch();
+-            }
+-
+-            stmt.executeBatch();
+-
+-            conn.commit();
+-        } catch (SQLException e) {
+-            try (Connection conn = dataSource.getConnection()) {
+-                conn.rollback();
+-            } catch (SQLException rollbackException) {
+-                System.err.println("Error rolling back transaction: " + rollbackException.getMessage());
+-            }
+-
+-            throw new RuntimeException("Error updating usernames in batch in DB", e);
+-        }
+-    }
+-}
+Index: src/main/java/org/example/UserService.java
+===================================================================
+diff --git a/src/main/java/org/example/UserService.java b/src/main/java/org/example/UserService.java
+deleted file mode 100644
+--- a/src/main/java/org/example/UserService.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,22 +0,0 @@
+-package org.example;
+-
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-
+-public interface UserService {
+-    void registerUser(String userName);
+-
+-    void renameUser(Long id, String newUserName);
+-
+-    void deleteUser(Long id);
+-
+-    void updateUserNames(Map<Long, String> idToUsernameMap);
+-
+-    Optional<User> getUser(Long id);
+-
+-    List<User> getAllUsers();
+-
+-    List<User> searchUsers(String usernamePart, int limit, int offset);
+-}
+-
+Index: src/main/java/org/example/UserServiceImpl.java
+===================================================================
+diff --git a/src/main/java/org/example/UserServiceImpl.java b/src/main/java/org/example/UserServiceImpl.java
+deleted file mode 100644
+--- a/src/main/java/org/example/UserServiceImpl.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ /dev/null	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
+@@ -1,89 +0,0 @@
+-package org.example;
+-
+-import org.springframework.transaction.annotation.Transactional;
+-
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-import java.util.regex.Pattern;
+-
+-public class UserServiceImpl implements UserService {
+-    private final UserDao userDao;
+-
+-    public UserServiceImpl(UserDao userDao) {
+-        this.userDao = userDao;
+-    }
+-
+-    @Override
+-    public void registerUser(String username) throws ValidationException {
+-        validateUsername(username);
+-
+-        User user = new User();
+-        user.setUserName(username);
+-
+-        userDao.create(user);
+-
+-        System.out.println("User created: " + user.getUserName());
+-    }
+-
+-    @Override
+-    public void renameUser(Long id, String newUserName) throws ValidationException {
+-        validateUsername(newUserName);
+-        Optional<User> optionalUser = userDao.findById(id);
+-
+-        if (optionalUser.isPresent()) {
+-            User user = optionalUser.get();
+-            user.setUserName(newUserName);
+-
+-            userDao.update(user);
+-            System.out.println("User updated: " + user.getUserName());
+-        }
+-    }
+-
+-    @Override
+-    @Transactional
+-    public void updateUserNames(Map<Long, String> idToUserNameMap) {
+-        for (String userName : idToUserNameMap.values()) {
+-            validateUsername(userName);
+-        }
+-
+-        userDao.updateUserNames(idToUserNameMap);
+-        System.out.println("UserNames updated in bulk: " + idToUserNameMap.size() + " users");
+-    }
+-
+-    @Override
+-    public void deleteUser(Long id) {
+-        userDao.delete(id);
+-
+-        System.out.println("User with id: " + id + " is removed");
+-    }
+-
+-    @Override
+-    public Optional<User> getUser(Long id) {
+-        return userDao.findById(id);
+-    }
+-
+-    @Override
+-    public List<User> getAllUsers() {
+-        return userDao.findAll();
+-    }
+-
+-    @Override
+-    public List<User> searchUsers(String usernamePart, int limit, int offset) {
+-        return userDao.searchUsers(usernamePart, limit, offset);
+-    }
+-
+-    private void validateUsername(String username) {
+-        if (username == null || username.isEmpty()) {
+-            throw new ValidationException("Имя пользователя не должно быть пустым.");
+-        }
+-
+-        if (username.length() < 3 || username.length() > 30) {
+-            throw new ValidationException("Имя пользователя должно быть не менее 3 символов и не более 30 символов.");
+-        }
+-
+-        if (!Pattern.matches("^[a-zA-Z0-9_]+$", username)) {
+-            throw new ValidationException("Имя пользователя может содержать только буквы, цифры и подчеркивания.");
+-        }
+-    }
+-}
+Index: src/main/java/org/example/utils/mappers/ProductMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/utils/mappers/ProductMapper.java b/src/main/java/org/example/utils/mappers/ProductMapper.java
+new file mode 100644
+--- /dev/null	(date 1756296357866)
++++ b/src/main/java/org/example/utils/mappers/ProductMapper.java	(date 1756296357866)
+@@ -0,0 +1,17 @@
++package org.example.utils.mappers;
++
++import org.example.domain.Product;
++import org.example.dto.ProductDto;
++
++public final class ProductMapper {
++    private ProductMapper() {}
++
++    public static ProductDto toDto(Product p) {
++        return new ProductDto(
++                p.getId(),
++                p.getAccountNumber(),
++                p.getBalance(),
++                p.getType()
++        );
++    }
++}
+Index: src/main/java/org/example/domain/Product.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/domain/Product.java b/src/main/java/org/example/domain/Product.java
+new file mode 100644
+--- /dev/null	(date 1756295622540)
++++ b/src/main/java/org/example/domain/Product.java	(date 1756295622540)
+@@ -0,0 +1,110 @@
++package org.example.domain;
++
++import jakarta.persistence.*;
++import jakarta.validation.constraints.NotBlank;
++import jakarta.validation.constraints.NotNull;
++import org.hibernate.annotations.CreationTimestamp;
++import org.hibernate.annotations.UpdateTimestamp;
++
++import java.math.BigDecimal;
++import java.time.Instant;
++import java.util.Objects;
++
++@Entity
++@Table(name = "products")
++public class Product {
++    @Id
++    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq")
++    @SequenceGenerator(name = "product_seq", sequenceName = "product_seq", allocationSize = 50)
++    private Long id;
++
++    @Column(name = "account_number", nullable = false, unique = true, length = 32)
++    @NotBlank
++    private String accountNumber;
++
++    @Column(nullable = false, precision = 19, scale = 2)
++    @NotNull
++    private BigDecimal balance = BigDecimal.ZERO;
++
++    @Column(nullable = false, length = 20)
++    @NotNull
++    private String type;
++
++    @Column(name = "created_at", nullable = false)
++    @CreationTimestamp
++    private Instant createdAt;
++
++    @Column(name = "updated_at", nullable = false)
++    @UpdateTimestamp
++    private Instant updatedAt;
++
++    @ManyToOne(fetch = FetchType.LAZY, optional = false)
++    @JoinColumn(name = "author_id", nullable = false, foreignKey = @ForeignKey(name = "fk_products_author"))
++    private Author author;
++
++    public Long getId() {
++        return id;
++    }
++
++    public String getAccountNumber() {
++        return accountNumber;
++    }
++
++    public BigDecimal getBalance() {
++        return balance;
++    }
++
++    public String getType() {
++        return type;
++    }
++
++    public Author getAuthor() {
++        return author;
++    }
++
++    public Instant getCreatedAt() {
++        return createdAt;
++    }
++
++    public Instant getUpdatedAt() {
++        return updatedAt;
++    }
++
++    public void setAccountNumber(String accountNumber) {
++        this.accountNumber = accountNumber;
++    }
++
++    public void setBalance(BigDecimal balance) {
++        this.balance = balance;
++    }
++
++    public void setType(String type) {
++        this.type = type;
++    }
++
++    public void setAuthor(Author author) {
++        this.author = author;
++    }
++
++    @Override
++    public boolean equals(Object o) {
++        if (o == null || getClass() != o.getClass()) return false;
++        Product product = (Product) o;
++        return Objects.equals(getId(), product.getId()) && Objects.equals(getAccountNumber(), product.getAccountNumber()) && Objects.equals(getType(), product.getType());
++    }
++
++    @Override
++    public int hashCode() {
++        return Objects.hash(getId(), getAccountNumber(), getType());
++    }
++
++    @Override
++    public String toString() {
++        return "Product{" +
++                "id=" + id +
++                ", accountNumber='" + accountNumber + '\'' +
++                ", type='" + type + '\'' +
++                '}';
++    }
++}
++
+Index: src/main/java/org/example/dto/ProductDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/dto/ProductDto.java b/src/main/java/org/example/dto/ProductDto.java
+new file mode 100644
+--- /dev/null	(date 1756296357855)
++++ b/src/main/java/org/example/dto/ProductDto.java	(date 1756296357855)
+@@ -0,0 +1,10 @@
++package org.example.dto;
++
++import java.math.BigDecimal;
++
++public record ProductDto(
++        Long id,
++        String accountNumber,
++        BigDecimal balance,
++        String type
++) {}
+Index: src/main/java/org/example/bootstrap/DataLoader.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/bootstrap/DataLoader.java b/src/main/java/org/example/bootstrap/DataLoader.java
+new file mode 100644
+--- /dev/null	(date 1756305916207)
++++ b/src/main/java/org/example/bootstrap/DataLoader.java	(date 1756305916207)
+@@ -0,0 +1,87 @@
++package org.example.bootstrap;
++
++import org.example.domain.Article;
++import org.example.domain.Author;
++import org.example.domain.Product;
++import org.example.repository.AuthorRepository;
++import org.springframework.boot.CommandLineRunner;
++import org.springframework.stereotype.Component;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.math.BigDecimal;
++
++@Component
++public class DataLoader implements CommandLineRunner {
++
++    private final AuthorRepository authors;
++
++    public DataLoader(AuthorRepository authors) {
++        this.authors = authors;
++    }
++
++    @Override
++    @Transactional
++    public void run(String[] args) {
++        Author author1 = new Author();
++        Author author2 = new Author();
++
++        author1.setName("Fedor");
++        author2.setName("Petr");
++
++        Article article1 = new Article();
++        Article article2 = new Article();
++        Article article3 = new Article();
++        Article article4 = new Article();
++        Article article5 = new Article();
++
++        article1.setContent("1 статья автора1 - Fedor");
++        article2.setContent("2 статья автора1 - Fedor");
++        article3.setContent("3 статья автора1 - Fedor");
++        article4.setContent("4 статья автора2 - Petr");
++        article5.setContent("5 статья автора2 - Petr");
++
++        author1.addArticle(article1);
++        author1.addArticle(article2);
++        author1.addArticle(article3);
++
++        author2.addArticle(article4);
++        author2.addArticle(article5);
++
++        Product product1 = new Product();
++        Product product2 = new Product();
++        Product product3 = new Product();
++
++        product1.setAccountNumber("ACC-001");
++        product1.setBalance(new BigDecimal("1234.56"));
++        product1.setType("ACCOUNT");
++
++        product2.setAccountNumber("CARD-4111");
++        product2.setBalance(new BigDecimal("99.99"));
++        product2.setType("CARD");
++
++        product3.setAccountNumber("CARD-002");
++        product3.setBalance(new BigDecimal("7890.11"));
++        product3.setType("CARD");
++
++        author1.addProduct(product1);
++        author1.addProduct(product2);
++
++        author2.addProduct(product3);
++
++        authors.save(author1);
++        authors.save(author2);
++
++        authors.findByName("Fedor").ifPresent(loaded -> {
++            System.out.println("Loaded author: " + loaded);
++            System.out.println("Notes count: " + loaded.getArticles().size());
++            System.out.println("Products count: " + loaded.getProducts().size());
++        });
++
++        authors.findByName("Petr").ifPresent(loaded -> {
++            System.out.println("Loaded author: " + loaded);
++            System.out.println("Notes count: " + loaded.getArticles().size());
++            System.out.println("Products count: " + loaded.getProducts().size());
++        });
++    }
++}
++
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"CompilerConfiguration\">\n    <annotationProcessing>\n      <profile name=\"Maven default annotation processors profile\" enabled=\"true\">\n        <sourceOutputDir name=\"target/generated-sources/annotations\" />\n        <sourceTestOutputDir name=\"target/generated-test-sources/test-annotations\" />\n        <outputRelativeToContentRoot value=\"true\" />\n        <module name=\"hw-db-connection\" />\n      </profile>\n    </annotationProcessing>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ b/.idea/compiler.xml	(date 1756283723387)
+@@ -10,4 +10,9 @@
+       </profile>
+     </annotationProcessing>
+   </component>
++  <component name="JavacSettings">
++    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
++      <module name="hw-db-connection" options="-parameters" />
++    </option>
++  </component>
+ </project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"9a3f6905-9b3d-4761-9387-94c8c3a9766b\" name=\"Changes\" comment=\"\">\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/org/example/Article.java\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/org/example/Author.java\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/org/example/JpaUtil.java\" afterDir=\"false\" />\n      <change afterPath=\"$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.gitignore\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.gitignore\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/docker-compose.yaml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/docker-compose.yaml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/pom.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/pom.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/org/example/Main.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/org/example/Main.java\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"Interface\" />\n        <option value=\"Class\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;VioletNeon&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/VioletNeon/hw-db-connection.git&quot;,\n    &quot;accountId&quot;: &quot;f1d1cb20-6e24-4a30-a0b8-a190a8f7b976&quot;\n  }\n}</component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 4\n}</component>\n  <component name=\"ProjectId\" id=\"31GpIZcmkFKRFIOzkLp228PXZ29\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"autoscrollFromSource\" value=\"true\" />\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"Application.Main.executor\": \"Run\",\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"git-widget-placeholder\": \"HW5\",\n    \"onboarding.tips.debug.path\": \"/Users/violetneon/IdeaProjects/hw-db-connection/src/main/java/org/example/Main.java\"\n  }\n}]]></component>\n  <component name=\"RunManager\">\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.Main\" />\n      <module name=\"hw-db-connection\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"org.example.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.Main\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"9a3f6905-9b3d-4761-9387-94c8c3a9766b\" name=\"Changes\" comment=\"\" />\n      <created>1755160184869</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1755160184869</updated>\n    </task>\n    <servers />\n  </component>\n  <component name=\"UnknownFeatures\">\n    <option featureType=\"com.intellij.fileTypeFactory\" implementationName=\"docker-compose.yaml\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ b/.idea/workspace.xml	(date 1756304905666)
+@@ -5,15 +5,32 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="9a3f6905-9b3d-4761-9387-94c8c3a9766b" name="Changes" comment="">
+-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/Article.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/Author.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/JpaUtil.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/bootstrap/DataLoader.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/ProductController.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/domain/Product.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/ProductDto.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/exception/RestExceptionHandler.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/repository/ArticleRepository.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/repository/AuthorRepository.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/repository/ProductRepository.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/java/org/example/utils/mappers/ProductMapper.java" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/src/main/resources/db/migration/V1__init_schema.sql" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Article.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/domain/Article.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Author.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/domain/Author.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Configurer.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/JpaUtil.java" beforeDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Main.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/User.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserDao.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserDaoImpl.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserService.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/UserServiceImpl.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/ValidationException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/exception/ValidationException.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/resources/META-INF/persistence.xml" beforeDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -67,7 +84,7 @@
+       <module name="hw-db-connection" />
+       <extension name="coverage">
+         <pattern>
+-          <option name="PATTERN" value="org.example.*" />
++          <option name="PATTERN" value="org.example.domain.*" />
+           <option name="ENABLED" value="true" />
+         </pattern>
+       </extension>
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n    <modelVersion>4.0.0</modelVersion>\n\n    <groupId>org.example</groupId>\n    <artifactId>hw-db-connection</artifactId>\n    <version>1.0-SNAPSHOT</version>\n\n    <properties>\n        <maven.compiler.source>17</maven.compiler.source>\n        <maven.compiler.target>17</maven.compiler.target>\n        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\n    </properties>\n\n    <dependencies>\n        <!-- Hibernate ORM 6 (Jakarta Persistence 3.x) -->\n        <dependency>\n            <groupId>org.hibernate.orm</groupId>\n            <artifactId>hibernate-core</artifactId>\n            <version>6.5.3.Final</version>\n        </dependency>\n\n        <!-- JPA API (Jakarta Persistence) -->\n        <dependency>\n            <groupId>jakarta.persistence</groupId>\n            <artifactId>jakarta.persistence-api</artifactId>\n            <version>3.1.0</version>\n        </dependency>\n\n        <dependency>\n            <groupId>org.postgresql</groupId>\n            <artifactId>postgresql</artifactId>\n            <version>42.7.3</version>\n        </dependency>\n        <dependency>\n            <groupId>com.zaxxer</groupId>\n            <artifactId>HikariCP</artifactId>\n            <version>5.1.0</version>\n            <optional>true</optional>\n        </dependency>\n        <dependency>\n            <groupId>org.springframework</groupId>\n            <artifactId>spring-context</artifactId>\n            <version>6.2.7</version>\n            <optional>true</optional>\n        </dependency>\n\n        <!-- Bean Validation (для jakarta.validation.* аннотаций) -->\n        <dependency>\n            <groupId>org.hibernate.validator</groupId>\n            <artifactId>hibernate-validator</artifactId>\n            <version>8.0.1.Final</version>\n        </dependency>\n        <dependency>\n            <groupId>jakarta.validation</groupId>\n            <artifactId>jakarta.validation-api</artifactId>\n            <version>3.0.2</version>\n        </dependency>\n\n        <dependency>\n            <groupId>org.slf4j</groupId>\n            <artifactId>slf4j-simple</artifactId>\n            <version>2.0.13</version>\n            <scope>runtime</scope>\n        </dependency>\n        <dependency>\n            <groupId>org.springframework</groupId>\n            <artifactId>spring-tx</artifactId>\n            <version>6.2.9</version>\n        </dependency>\n        <dependency>\n            <groupId>org.springframework</groupId>\n            <artifactId>spring-jdbc</artifactId>\n            <version>6.2.9</version>\n        </dependency>\n    </dependencies>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ b/pom.xml	(date 1756304370945)
+@@ -5,7 +5,7 @@
+     <modelVersion>4.0.0</modelVersion>
+ 
+     <groupId>org.example</groupId>
+-    <artifactId>hw-db-connection</artifactId>
++    <artifactId>JavaProFrom12</artifactId>
+     <version>1.0-SNAPSHOT</version>
+ 
+     <properties>
+@@ -14,66 +14,67 @@
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+     </properties>
+ 
++    <!-- Управляем версиями через Spring Boot BOM -->
++    <parent>
++        <groupId>org.springframework.boot</groupId>
++        <artifactId>spring-boot-starter-parent</artifactId>
++        <version>3.3.2</version>
++        <relativePath/>
++    </parent>
++
++
+     <dependencies>
+-        <!-- Hibernate ORM 6 (Jakarta Persistence 3.x) -->
+-        <dependency>
+-            <groupId>org.hibernate.orm</groupId>
+-            <artifactId>hibernate-core</artifactId>
+-            <version>6.5.3.Final</version>
+-        </dependency>
+-
+-        <!-- JPA API (Jakarta Persistence) -->
+-        <dependency>
+-            <groupId>jakarta.persistence</groupId>
+-            <artifactId>jakarta.persistence-api</artifactId>
+-            <version>3.1.0</version>
+-        </dependency>
+-
+-        <dependency>
+-            <groupId>org.postgresql</groupId>
+-            <artifactId>postgresql</artifactId>
+-            <version>42.7.3</version>
+-        </dependency>
++        <!--  для примера-->
+         <dependency>
+-            <groupId>com.zaxxer</groupId>
+-            <artifactId>HikariCP</artifactId>
+-            <version>5.1.0</version>
+-            <optional>true</optional>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-web</artifactId>
+         </dependency>
++
++        <!-- JPA + Hibernate -->
+         <dependency>
+-            <groupId>org.springframework</groupId>
+-            <artifactId>spring-context</artifactId>
+-            <version>6.2.7</version>
+-            <optional>true</optional>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-data-jpa</artifactId>
+         </dependency>
+ 
+-        <!-- Bean Validation (для jakarta.validation.* аннотаций) -->
++        <!-- Валидации (jakarta.validation) -->
+         <dependency>
+-            <groupId>org.hibernate.validator</groupId>
+-            <artifactId>hibernate-validator</artifactId>
+-            <version>8.0.1.Final</version>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-validation</artifactId>
+         </dependency>
++
++        <!-- Драйвер PostgreSQL -->
+         <dependency>
+-            <groupId>jakarta.validation</groupId>
+-            <artifactId>jakarta.validation-api</artifactId>
+-            <version>3.0.2</version>
++            <groupId>org.postgresql</groupId>
++            <artifactId>postgresql</artifactId>
++            <scope>runtime</scope>
+         </dependency>
+ 
++        <!-- Логи (входит в стартеры, дополнительно ничего не надо) -->
++        <!-- Тесты -->
+         <dependency>
+-            <groupId>org.slf4j</groupId>
+-            <artifactId>slf4j-simple</artifactId>
+-            <version>2.0.13</version>
+-            <scope>runtime</scope>
++            <groupId>org.springframework.boot</groupId>
++            <artifactId>spring-boot-starter-test</artifactId>
++            <scope>test</scope>
+         </dependency>
++
++        <!--  НОВОЕ: Flyway -->
+         <dependency>
+-            <groupId>org.springframework</groupId>
+-            <artifactId>spring-tx</artifactId>
+-            <version>6.2.9</version>
++            <groupId>org.flywaydb</groupId>
++            <artifactId>flyway-core</artifactId>
+         </dependency>
++        <!--  Для Flyway 10+ нужен плагин конкретной СУБД -->
+         <dependency>
+-            <groupId>org.springframework</groupId>
+-            <artifactId>spring-jdbc</artifactId>
+-            <version>6.2.9</version>
++            <groupId>org.flywaydb</groupId>
++            <artifactId>flyway-database-postgresql</artifactId>
+         </dependency>
+     </dependencies>
+-</project>
+\ No newline at end of file
++
++    <build>
++        <plugins>
++            <plugin>
++                <groupId>org.springframework.boot</groupId>
++                <artifactId>spring-boot-maven-plugin</artifactId>
++            </plugin>
++        </plugins>
++    </build>
++</project>
+Index: src/main/java/org/example/ValidationException.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/ValidationException.java b/src/main/java/org/example/exception/ValidationException.java
+rename from src/main/java/org/example/ValidationException.java
+rename to src/main/java/org/example/exception/ValidationException.java
+--- a/src/main/java/org/example/ValidationException.java	(revision 4bae1f8b9f2ce07cfa39644ccbbe08884b606b83)
++++ b/src/main/java/org/example/exception/ValidationException.java	(date 1756281823367)
+@@ -1,4 +1,4 @@
+-package org.example;
++package org.example.exception;
+ 
+ public class ValidationException extends RuntimeException {
+     public ValidationException(String message) {
+Index: src/main/resources/application.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/application.yaml b/src/main/resources/application.yaml
+new file mode 100644
+--- /dev/null	(date 1756306103479)
++++ b/src/main/resources/application.yaml	(date 1756306103479)
+@@ -0,0 +1,31 @@
++spring:
++  main:
++    web-application-type: servlet
++
++  datasource:
++    url: jdbc:postgresql://localhost:5433/pgsdb
++    username: pgsuser
++    password: pgspw
++
++  jpa:
++    hibernate:
++      ddl-auto: validate
++    show-sql: true
++    properties:
++      hibernate.format_sql: true
++      hibernate.highlight_sql: true
++
++  output.ansi.enabled: always
++
++  flyway:
++    enabled: true
++    locations: classpath:db/migration
++    clean-disabled: false
++    default-schema: public
++
++logging:
++  level:
++    org.hibernate.SQL: debug
++    org.hibernate.orm.jdbc.bind: trace
++server:
++  port: 8080
+Index: src/main/java/org/example/repository/ArticleRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/repository/ArticleRepository.java b/src/main/java/org/example/repository/ArticleRepository.java
+new file mode 100644
+--- /dev/null	(date 1756295817030)
++++ b/src/main/java/org/example/repository/ArticleRepository.java	(date 1756295817030)
+@@ -0,0 +1,7 @@
++package org.example.repository;
++
++import org.example.domain.Article;
++import org.springframework.data.jpa.repository.JpaRepository;
++
++public interface ArticleRepository extends JpaRepository<Article, Long> {
++}
+Index: src/main/resources/db/migration/V1__init_schema.sql
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/db/migration/V1__init_schema.sql b/src/main/resources/db/migration/V1__init_schema.sql
+new file mode 100644
+--- /dev/null	(date 1756306034685)
++++ b/src/main/resources/db/migration/V1__init_schema.sql	(date 1756306034685)
+@@ -0,0 +1,40 @@
++-- СЕКВЕНСЫ (шаг 50)
++create sequence if not exists author_seq start with 1 increment by 50;
++create sequence if not exists article_seq start with 1 increment by 50;
++create sequence if not exists product_seq start with 1 increment by 50;
++
++-- AUTHORS
++create table if not exists authors (
++    id        bigint primary key,
++    name      varchar(30) not null unique
++);
++
++-- ARTICLES
++create table if not exists articles (
++    id          bigint primary key,
++    content     varchar(1000) not null,
++    created_at  timestamp(6) with time zone not null,
++    updated_at  timestamp(6) with time zone not null,
++    author_id   bigint not null
++);
++
++alter table articles
++  add constraint fk_articles_author
++  foreign key (author_id) references authors(id);
++
++-- PRODUCTS
++create table if not exists products (
++    id              bigint primary key,
++    account_number  varchar(32) not null unique,
++    balance         numeric(19,2) not null default 0,
++    type            varchar(20)  not null,
++    created_at      timestamp(6) with time zone not null,
++    updated_at      timestamp(6) with time zone not null,
++    author_id       bigint not null
++);
++
++alter table products
++  add constraint fk_products_author
++  foreign key (author_id) references authors(id);
++
++create index if not exists ix_products_author on products(author_id);
+Index: src/main/java/org/example/repository/AuthorRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/repository/AuthorRepository.java b/src/main/java/org/example/repository/AuthorRepository.java
+new file mode 100644
+--- /dev/null	(date 1756295939308)
++++ b/src/main/java/org/example/repository/AuthorRepository.java	(date 1756295939308)
+@@ -0,0 +1,10 @@
++package org.example.repository;
++
++import org.example.domain.Author;
++import org.springframework.data.jpa.repository.JpaRepository;
++
++import java.util.Optional;
++
++public interface AuthorRepository extends JpaRepository<Author, Long> {
++    Optional<Author> findByName(String name);
++}
+Index: src/main/java/org/example/repository/ProductRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/repository/ProductRepository.java b/src/main/java/org/example/repository/ProductRepository.java
+new file mode 100644
+--- /dev/null	(date 1756297835795)
++++ b/src/main/java/org/example/repository/ProductRepository.java	(date 1756297835795)
+@@ -0,0 +1,10 @@
++package org.example.repository;
++
++import org.example.domain.Product;
++import org.springframework.data.jpa.repository.JpaRepository;
++
++import java.util.List;
++
++public interface ProductRepository extends JpaRepository<Product, Long> {
++    List<Product> findAllByAuthorId(Long authorId);
++}
+Index: src/main/java/org/example/controller/ProductController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/controller/ProductController.java b/src/main/java/org/example/controller/ProductController.java
+new file mode 100644
+--- /dev/null	(date 1756297835805)
++++ b/src/main/java/org/example/controller/ProductController.java	(date 1756297835805)
+@@ -0,0 +1,40 @@
++package org.example.controller;
++
++import org.example.dto.ProductDto;
++import org.example.repository.ProductRepository;
++import org.example.utils.mappers.ProductMapper;
++import org.springframework.http.HttpStatus;
++import org.springframework.web.bind.annotation.*;
++import org.springframework.web.server.ResponseStatusException;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("/api/products")
++public class ProductController {
++
++    private final ProductRepository products;
++
++    public ProductController(ProductRepository products) {
++        this.products = products;
++    }
++
++    @GetMapping
++    public List<ProductDto> getByAuthor(@RequestParam(required = false) Long authorId) {
++        if (authorId == null) {
++            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "authorId is required");
++        }
++
++        return products.findAllByAuthorId(authorId).stream()
++                .map(ProductMapper::toDto)
++                .toList();
++    }
++
++    @GetMapping("/{id}")
++    public ProductDto getByProductId(@PathVariable Long productId) {
++        return products.findById(productId)
++                .map(ProductMapper::toDto)
++                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "product not found"));
++    }
++}
++
+Index: src/main/java/org/example/exception/RestExceptionHandler.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/org/example/exception/RestExceptionHandler.java b/src/main/java/org/example/exception/RestExceptionHandler.java
+new file mode 100644
+--- /dev/null	(date 1756296010444)
++++ b/src/main/java/org/example/exception/RestExceptionHandler.java	(date 1756296010444)
+@@ -0,0 +1,31 @@
++package org.example.exception;
++
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ProblemDetail;
++import org.springframework.web.bind.MethodArgumentNotValidException;
++import org.springframework.web.bind.MissingServletRequestParameterException;
++import org.springframework.web.bind.annotation.ExceptionHandler;
++import org.springframework.web.bind.annotation.RestControllerAdvice;
++import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
++import org.springframework.web.server.ResponseStatusException;
++
++@RestControllerAdvice
++public class RestExceptionHandler {
++    @ExceptionHandler(ResponseStatusException.class)
++    public ProblemDetail onResponseStatus(ResponseStatusException ex) {
++        ProblemDetail pd = ProblemDetail.forStatusAndDetail(ex.getStatusCode(), ex.getReason());
++        pd.setTitle("Request failed");
++        return pd;
++    }
++
++    @ExceptionHandler({
++            MissingServletRequestParameterException.class,
++            MethodArgumentTypeMismatchException.class,
++            MethodArgumentNotValidException.class
++    })
++    public ProblemDetail onBadRequest(Exception ex) {
++        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
++        pd.setTitle("Bad request");
++        return pd;
++    }
++}
