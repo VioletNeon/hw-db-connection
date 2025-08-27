@@ -1,0 +1,19 @@
+Index: docker-compose.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>version: '3.8'\nservices:\n  postgres:\n    image: postgres:16\n    container_name: java-pg\n    environment:\n      POSTGRES_DB: pgsdb\n      POSTGRES_USER: pgsuser\n      POSTGRES_PASSWORD: pgspw\n    ports:\n      - \"5433:5432\"\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docker-compose.yaml b/docker-compose.yaml
+--- a/docker-compose.yaml	(revision 2fae48408185715522eab90b30f4025b4511822a)
++++ b/docker-compose.yaml	(date 1756036717641)
+@@ -9,3 +9,8 @@
+       POSTGRES_PASSWORD: pgspw
+     ports:
+       - "5433:5432"
++    volumes:
++      - postgres_data:/var/lib/postgresql/data
++
++volumes:
++  postgres_data:
