@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: dev
+
   main:
     web-application-type: servlet
 
@@ -23,9 +26,16 @@ spring:
     clean-disabled: false
     default-schema: public
 
+payments:
+  products-base-url: "http://localhost:${sever.port}/api/products"
+  http:
+    connect-timeout-ms: 1500
+    read-timeout-ms: 2500
+
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
 server:
   port: 8080
