@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
@@ -34,6 +34,14 @@ public class Author {
     )
     private List<Article> articles = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "author",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<Product> products = new ArrayList<>();
+
     public void addArticle(Article article) {
         articles.add(article);
         article.setAuthor(this);
@@ -42,6 +50,16 @@ public class Author {
     public void removeArticle(Article article) {
         articles.remove(article);
         article.setAuthor(null);
+    }
+
+    public void addProduct(Product product) {
+        products.add(product);
+        product.setAuthor(this);
+    }
+
+    public void removeProduct(Product product) {
+        products.remove(product);
+        product.setAuthor(null);
     }
 
     public Long getId() {
@@ -54,6 +72,10 @@ public class Author {
 
     public List<Article> getArticles() {
         return articles;
+    }
+
+    public List<Product> getProducts() {
+        return products;
     }
 
     public void setName(String name) {
@@ -77,6 +99,6 @@ public class Author {
 
     @Override
     public String toString() {
-        return "User{id=" + id + ", name='" + name + "'}";
+        return "Author{id=" + id + ", name='" + name + "'}";
     }
 }
