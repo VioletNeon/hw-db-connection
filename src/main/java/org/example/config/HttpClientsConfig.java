@@ -7,11 +7,11 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-@EnableConfigurationProperties(PaymentsProperties.class)
+@EnableConfigurationProperties(ProductsProperties.class)
 public class HttpClientsConfig {
 
     @Bean
-    public RestClient paymentsRestClient(PaymentsProperties props) {
+    public RestClient productsRestClient(ProductsProperties props) {
         var factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(props.getHttp().getConnectTimeoutMs());
         factory.setReadTimeout(props.getHttp().getReadTimeoutMs());
