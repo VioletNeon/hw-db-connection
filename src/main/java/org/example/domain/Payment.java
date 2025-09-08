@@ -25,11 +25,25 @@ public class Payment {
     @Column(nullable = false)
     private PaymentStatus status;
 
+    @Column(name = "external_id", length = 64)
+    private String externalId;
+
     @Column(nullable = false)
     private OffsetDateTime createdAt;
 
     @Column(nullable = false)
     private OffsetDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = OffsetDateTime.now();
+        updatedAt = createdAt;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = OffsetDateTime.now();
+    }
 
     public Long getId() {
         return id;
@@ -71,6 +85,14 @@ public class Payment {
         this.status = status;
     }
 
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
@@ -108,6 +130,7 @@ public class Payment {
                 ", authorId=" + authorId +
                 ", amount=" + amount +
                 ", status=" + status +
+                ", externalId='" + externalId +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

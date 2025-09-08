@@ -1,0 +1,5 @@
+products:
+  base-url: "http://localhost:8080/__products_stub/api/products"
+  http:
+    connect-timeout-ms: 2000
+    read-timeout-ms: 3000
