@@ -9,6 +9,7 @@ import org.example.dto.ProductDto;
 import org.example.repository.PaymentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -19,14 +20,30 @@ import java.util.Optional;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ProductsClient productsClient;
+    private final LimitService limits;
 
-    public PaymentService(PaymentRepository paymentRepository, ProductsClient productsClient) {
+    public PaymentService(
+            PaymentRepository paymentRepository,
+            ProductsClient productsClient,
+            LimitService limits
+    ) {
         this.paymentRepository = paymentRepository;
         this.productsClient = productsClient;
+        this.limits = limits;
     }
 
     @Transactional
     public Payment execute(PaymentDto req) {
+        if (!StringUtils.hasText(req.externalId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "externalId is required");
+        }
+
+        var existing = paymentRepository.findByExternalId(req.externalId());
+
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
         if (req.authorId() == null || req.authorId() < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "authorId must be positive");
         }
@@ -39,23 +56,45 @@ public class PaymentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "amount must be > 0");
         }
 
-        ProductDto product = productsClient.findById(req.productId());
+        boolean reserved = false;
+        Payment payment = null;
 
-        if (product == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+        try {
+            limits.tryReserve(req.authorId(), req.amount());
+            reserved = true;
+
+            ProductDto product = productsClient.findById(req.productId());
+
+            if (product.balance().compareTo(req.amount()) < 0) {
+                limits.restore(req.authorId(), req.amount());
+                reserved = false;
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
+            }
+
+            payment = new Payment();
+            payment.setAuthorId(req.authorId());
+            payment.setProductId(req.productId());
+            payment.setAmount(req.amount());
+            payment.setExternalId(req.externalId());
+            payment.setStatus(PaymentStatus.PENDING);
+            payment = paymentRepository.save(payment);
+
+            payment.setStatus(PaymentStatus.SUCCESS);
+
+            return paymentRepository.save(payment);
+        } catch (RuntimeException ex) {
+            if (reserved) {
+                limits.restore(req.authorId(), req.amount());
+            }
+
+            if (payment != null && payment.getId() != null && payment.getStatus() != PaymentStatus.FAILED) {
+                payment.setStatus(PaymentStatus.FAILED);
+                paymentRepository.save(payment);
+            }
+
+            throw ex;
         }
 
-        if (product.balance().compareTo(req.amount()) < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
-        }
-
-        Payment payment = new Payment();
-        payment.setAuthorId(req.authorId());
-        payment.setProductId(req.productId());
-        payment.setAmount(req.amount());
-        payment.setStatus(PaymentStatus.SUCCESS);
-
-        return paymentRepository.save(payment);
     }
 
     public Optional<Payment> findById(Long id) {

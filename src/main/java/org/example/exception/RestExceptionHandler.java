@@ -1,6 +1,7 @@
 package org.example.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -80,4 +81,19 @@ public class RestExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(LimitExceededException.class)
+    public ProblemDetail onLimitExceeded(LimitExceededException ex) {
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        pd.setTitle("Limit exceeded");
+
+        return pd;
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail onIdempotencyConflict(DataIntegrityViolationException ex) {
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Duplicate externalId");
+        pd.setTitle("Idempotency conflict");
+
+        return pd;
+    }
 }

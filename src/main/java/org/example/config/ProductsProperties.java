@@ -2,8 +2,8 @@ package org.example.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "payments")
-public class PaymentsProperties {
+@ConfigurationProperties(prefix = "products")
+public class ProductsProperties {
     private String productsBaseUrl;
     private Http http = new Http();
 

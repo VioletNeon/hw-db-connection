@@ -26,11 +26,53 @@ spring:
     clean-disabled: false
     default-schema: public
 
-payments:
+products:
   products-base-url: "http://localhost:${sever.port}/api/products"
   http:
     connect-timeout-ms: 1500
     read-timeout-ms: 2500
+
+limits:
+  default: 10000.00
+
+resilience4j:
+  retry:
+    instances:
+      products:
+        max-attempts: 3
+        wait-duration: 200ms
+        retry-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+        ignore-exceptions:
+          - org.springframework.web.client.HttpClientErrorException
+  circuitbreaker:
+    instances:
+      products:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,circuitbreakers,retries
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
 
 logging:
   level:
